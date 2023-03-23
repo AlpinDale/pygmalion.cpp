@@ -16,7 +16,7 @@ if [ -f "models/$FILENAME" ]; then
     echo -e "${YELLOW}File already exists and MD5 hash matches!${NC}"
     exit 0
   else
-    read -p "$(echo -e "${YELLOW}File already exists but MD5 hash doesn't match. Do you want to resume the download? [y/n]${NC}")" -n 1 -r
+    read -p "$(echo -e "${YELLOW}File already exists. Do you want to resume the download? [y/n]${NC}")" -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
       echo -e "${GREEN}Resuming download...${NC}"
