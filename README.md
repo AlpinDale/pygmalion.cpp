@@ -67,7 +67,7 @@ chmod +x ../examples/pyggy/download-pyg.sh
 ../examples/pyggy/download-pyg.sh
 ```
 
-And to run `pygmalion.cpp` (**make sure you replace the prompt with whatever you want, keep the quotations):
+And to run `pygmalion.cpp` (**make sure you replace the prompt with whatever you want, keep the quotations**):
 ```
 ./bin/pyggy -m models/pygmalion-6b-q4_0.bin -n 50 -p "Your prompt here."
 ```
