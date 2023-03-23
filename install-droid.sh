@@ -34,4 +34,4 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   ../examples/pyggy/download-pyg.sh
 fi
 
-cd ../..
+cd ~/pygmalion.cpp
