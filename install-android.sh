@@ -27,8 +27,7 @@ mkdir build && cd build
 cmake ..
 make pyggy
 
-read -p "$(echo -e "${YELLOW}Do you want to download the model now? (3.6GB) [y/n]${NC}")" -n 1 -r
-echo
+read -p "$(echo -e "${YELLOW}Do you want to download the model now? (3.6GB) [y/n]${NC}")" REPLY
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   echo -e "${GREEN}Downloading model...${NC}"
   chmod +x ../examples/pyggy/download-pyg.sh
