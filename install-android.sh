@@ -1,35 +1,27 @@
 #!/bin/bash
 
-echo "Installing required packages..."
-pkg install clang wget
-apt install git build-essential
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # no color
 
-echo "Cloning pygmalion.cpp repository..."
+echo -e "${GREEN}Installing required packages...${NC}"
+sudo apt install clang wget -y
+sudo apt install git build-essential -y
+
+echo -e "${GREEN}Cloning pygmalion.cpp repository...${NC}"
 git clone https://github.com/AlpinDale/pygmalion.cpp && cd pygmalion.cpp
 
-echo "Creating build directory..."
+echo -e "${GREEN}Compiling pyggy...${NC}"
 mkdir build && cd build
-
-echo "Configuring CMake..."
 cmake ..
-
-echo "Building pyggy..."
 make pyggy
 
-read -p "Do you want to download the model now? [y/n]: " -n 1 -r
+read -p "$(echo -e "${YELLOW}Do you want to download the model now? (3.6GB) [y/n]${NC}")" -n 1 -r
 echo
-
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  echo "The model takes up 3.6GB of space."
-  read -p "Are you sure you want to download it now? [y/n]: " -n 1 -r
-  echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "Downloading the model..."
-    chmod +x ../examples/pyggy/download-pyg.sh
-    ../examples/pyggy/download-pyg.sh
-  else
-    echo "Model download cancelled."
-  fi
-else
-  echo "All done! If you want to use the model, please run the 'start.sh' script."
+  echo -e "${GREEN}Downloading model...${NC}"
+  chmod +x ../examples/pyggy/download-pyg.sh
+  ../examples/pyggy/download-pyg.sh
 fi
+
+cd ../..
