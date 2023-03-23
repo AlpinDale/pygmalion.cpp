@@ -10,7 +10,8 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <cassert>
+#include <iostream>
+#include <unistd.h>
 
 // default hparams (GPT-J 6B)
 struct gptj_hparams {
@@ -131,23 +132,9 @@ bool gptj_model_load(const std::string & fname, gptj_model & model, gpt_vocab & 
         }
     }
 
-    // for the big tensors, we have the option to store the data in 16-bit floats or quantized
+    // for the big tensors, we have the option to store the data in 16-bit floats
     // in order to save memory and also to speed up the computation
-    ggml_type wtype = GGML_TYPE_COUNT;
-    switch (model.hparams.f16) {
-        case 0: wtype = GGML_TYPE_F32;  break;
-        case 1: wtype = GGML_TYPE_F16;  break;
-        case 2: wtype = GGML_TYPE_Q4_0; break;
-        case 3: wtype = GGML_TYPE_Q4_1; break;
-        default:
-                {
-                    fprintf(stderr, "%s: invalid model file '%s' (bad f16 value %d)\n",
-                            __func__, fname.c_str(), model.hparams.f16);
-                    return false;
-                }
-    }
-
-    const ggml_type wtype2 = GGML_TYPE_F32;
+    const ggml_type wtype = model.hparams.f16 ? GGML_TYPE_F16 : GGML_TYPE_F32;
 
     auto & ctx = model.ctx;
 
@@ -161,31 +148,31 @@ bool gptj_model_load(const std::string & fname, gptj_model & model, gpt_vocab & 
         const int n_ctx   = hparams.n_ctx;
         const int n_vocab = hparams.n_vocab;
 
-        ctx_size += n_embd*ggml_type_sizef(GGML_TYPE_F32); // ln_f_g
-        ctx_size += n_embd*ggml_type_sizef(GGML_TYPE_F32); // ln_f_b
+        ctx_size += n_embd*ggml_type_size(GGML_TYPE_F32); // ln_f_g
+        ctx_size += n_embd*ggml_type_size(GGML_TYPE_F32); // ln_f_b
 
-        ctx_size += n_embd*n_vocab*ggml_type_sizef(wtype); // wte
+        ctx_size += n_embd*n_vocab*ggml_type_size(wtype); // wte
 
-        ctx_size += n_embd*n_vocab*ggml_type_sizef(wtype);         // lmh_g
-        ctx_size +=        n_vocab*ggml_type_sizef(GGML_TYPE_F32); // lmh_b
+        ctx_size += n_embd*n_vocab*ggml_type_size(wtype);         // lmh_g
+        ctx_size +=        n_vocab*ggml_type_size(GGML_TYPE_F32); // lmh_b
 
-        ctx_size += n_layer*(n_embd*ggml_type_sizef(GGML_TYPE_F32)); // ln_1_g
-        ctx_size += n_layer*(n_embd*ggml_type_sizef(GGML_TYPE_F32)); // ln_1_b
+        ctx_size += n_layer*(n_embd*ggml_type_size(GGML_TYPE_F32)); // ln_1_g
+        ctx_size += n_layer*(n_embd*ggml_type_size(GGML_TYPE_F32)); // ln_1_b
 
-        ctx_size += n_layer*(n_embd*n_embd*ggml_type_sizef(wtype)); // c_attn_q_proj_w
-        ctx_size += n_layer*(n_embd*n_embd*ggml_type_sizef(wtype)); // c_attn_k_proj_w
-        ctx_size += n_layer*(n_embd*n_embd*ggml_type_sizef(wtype)); // c_attn_v_proj_w
+        ctx_size += n_layer*(n_embd*n_embd*ggml_type_size(wtype)); // c_attn_q_proj_w
+        ctx_size += n_layer*(n_embd*n_embd*ggml_type_size(wtype)); // c_attn_k_proj_w
+        ctx_size += n_layer*(n_embd*n_embd*ggml_type_size(wtype)); // c_attn_v_proj_w
 
-        ctx_size += n_layer*(n_embd*n_embd*ggml_type_sizef(wtype)); // c_attn_proj_w
+        ctx_size += n_layer*(n_embd*n_embd*ggml_type_size(wtype)); // c_attn_proj_w
 
-        ctx_size += n_layer*(4*n_embd*n_embd*ggml_type_sizef(wtype));         // c_mlp_fc_w
-        ctx_size += n_layer*(       4*n_embd*ggml_type_sizef(GGML_TYPE_F32)); // c_mlp_fc_b
+        ctx_size += n_layer*(4*n_embd*n_embd*ggml_type_size(wtype));         // c_mlp_fc_w
+        ctx_size += n_layer*(       4*n_embd*ggml_type_size(GGML_TYPE_F32)); // c_mlp_fc_b
 
-        ctx_size += n_layer*(4*n_embd*n_embd*ggml_type_sizef(wtype));         // c_mlp_proj_w_trans
-        ctx_size += n_layer*(         n_embd*ggml_type_sizef(GGML_TYPE_F32)); // c_mlp_proj_b
+        ctx_size += n_layer*(4*n_embd*n_embd*ggml_type_size(wtype));         // c_mlp_proj_w_trans
+        ctx_size += n_layer*(         n_embd*ggml_type_size(GGML_TYPE_F32)); // c_mlp_proj_b
 
-        ctx_size += n_ctx*n_layer*n_embd*ggml_type_sizef(GGML_TYPE_F32); // memory_k
-        ctx_size += n_ctx*n_layer*n_embd*ggml_type_sizef(GGML_TYPE_F32); // memory_v
+        ctx_size += n_ctx*n_layer*n_embd*ggml_type_size(GGML_TYPE_F32); // memory_k
+        ctx_size += n_ctx*n_layer*n_embd*ggml_type_size(GGML_TYPE_F32); // memory_v
 
         ctx_size += (5 + 10*n_layer)*256; // object overhead
 
@@ -246,7 +233,7 @@ bool gptj_model_load(const std::string & fname, gptj_model & model, gpt_vocab & 
 
             layer.c_attn_proj_w         = ggml_new_tensor_2d(ctx, wtype,           n_embd,   n_embd);
 
-            layer.c_mlp_fc_w            = ggml_new_tensor_2d(ctx, wtype,           n_embd, 4*n_embd);
+            layer.c_mlp_fc_w            = ggml_new_tensor_2d(ctx, wtype,         4*n_embd,   n_embd);
             layer.c_mlp_fc_b            = ggml_new_tensor_1d(ctx, GGML_TYPE_F32, 4*n_embd);
 
             layer.c_mlp_proj_w_trans    = ggml_new_tensor_2d(ctx, wtype,         4*n_embd,   n_embd);
@@ -336,26 +323,9 @@ bool gptj_model_load(const std::string & fname, gptj_model & model, gpt_vocab & 
                 return false;
             }
 
-            if (0) {
-                static const char * ftype_str[] = { "f32", "f16", "q4_0", "q4_1", };
-                printf("%24s - [%5d, %5d], type = %6s, %6.2f MB, %9zu bytes\n", name.data(), ne[0], ne[1], ftype_str[ftype], ggml_nbytes(tensor)/1024.0/1024.0, ggml_nbytes(tensor));
-            }
+            const size_t bpe = tensor->type == GGML_TYPE_I8 ? 1 : (ftype == 0) ? sizeof(float) : sizeof(ggml_fp16_t);
 
-            size_t bpe = 0;
-
-            switch (ftype) {
-                case 0: bpe = ggml_type_size(GGML_TYPE_F32);  break;
-                case 1: bpe = ggml_type_size(GGML_TYPE_F16);  break;
-                case 2: bpe = ggml_type_size(GGML_TYPE_Q4_0); assert(ne[0] % 64 == 0); break;
-                case 3: bpe = ggml_type_size(GGML_TYPE_Q4_1); assert(ne[0] % 64 == 0); break;
-                default:
-                        {
-                            fprintf(stderr, "%s: unknown ftype %d in model file\n", __func__, ftype);
-                            return false;
-                        }
-            };
-
-            if ((nelements*bpe)/ggml_blck_size(tensor->type) != ggml_nbytes(tensor)) {
+            if (nelements*bpe != ggml_nbytes(tensor)) {
                 fprintf(stderr, "%s: tensor '%s' has wrong size in model file: got %zu, expected %zu\n",
                         __func__, name.data(), ggml_nbytes(tensor), nelements*bpe);
                 return false;
@@ -460,9 +430,9 @@ bool gptj_eval(
 
         // self-attention
         {
-            struct ggml_tensor * Qcur = ggml_mul_mat(ctx0, model.layers[il].c_attn_q_proj_w, cur);
-            struct ggml_tensor * Kcur = ggml_mul_mat(ctx0, model.layers[il].c_attn_k_proj_w, cur);
-            struct ggml_tensor * Vcur = ggml_mul_mat(ctx0, model.layers[il].c_attn_v_proj_w, cur);
+            struct ggml_tensor * Qcur = ggml_mul_mat(ctx0, ggml_transpose(ctx0, model.layers[il].c_attn_q_proj_w), cur);
+            struct ggml_tensor * Kcur = ggml_mul_mat(ctx0, ggml_transpose(ctx0, model.layers[il].c_attn_k_proj_w), cur);
+            struct ggml_tensor * Vcur = ggml_mul_mat(ctx0, ggml_transpose(ctx0, model.layers[il].c_attn_v_proj_w), cur);
 
             // store key and value to memory
             if (N >= 1) {
@@ -530,7 +500,7 @@ bool gptj_eval(
 
             // projection (no bias)
             cur = ggml_mul_mat(ctx0,
-                    model.layers[il].c_attn_proj_w,
+                    ggml_transpose(ctx0, model.layers[il].c_attn_proj_w),
                     cur);
         }
 
@@ -541,7 +511,7 @@ bool gptj_eval(
         {
             // note here we pass inpSA instead of cur
             cur = ggml_mul_mat(ctx0,
-                    model.layers[il].c_mlp_fc_w,
+                    ggml_transpose(ctx0, model.layers[il].c_mlp_fc_w),
                     inpSA);
 
             cur = ggml_add(ctx0,
@@ -623,7 +593,7 @@ int main(int argc, char ** argv) {
     const int64_t t_main_start_us = ggml_time_us();
 
     gpt_params params;
-    params.model = "models/pygmalion-6b-ggml-4bit/pygmalion-6b-q4_0.bin";
+    params.model = "models/gpt-j-6B/ggml-model.bin";
 
     if (gpt_params_parse(argc, argv, params) == false) {
         return 1;
@@ -636,6 +606,16 @@ int main(int argc, char ** argv) {
     printf("%s: seed = %d\n", __func__, params.seed);
 
     std::mt19937 rng(params.seed);
+    if (params.prompt.empty()) {
+        if( !isatty(STDIN_FILENO) ){
+            std::string line;
+            while( std::getline(std::cin, line) ){
+                params.prompt = params.prompt + "\n" + line;
+            }
+        } else {
+            params.prompt = gpt_random_prompt(rng);
+        }
+    }
 
     int64_t t_load_us = 0;
 
@@ -661,98 +641,90 @@ int main(int argc, char ** argv) {
 
     std::vector<float> logits;
 
+    // tokenize the prompt
+    std::vector<gpt_vocab::id> embd_inp = ::gpt_tokenize(vocab, params.prompt);
+
+    params.n_predict = std::min(params.n_predict, model.hparams.n_ctx - (int) embd_inp.size());
+
+    printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
+    printf("\n");
+
+    std::vector<gpt_vocab::id> embd;
+
     // determine the required inference memory per token:
     size_t mem_per_token = 0;
     gptj_eval(model, params.n_threads, 0, { 0, 1, 2, 3 }, logits, mem_per_token);
 
-    while (true) {
-        // prompt user for input
-        std::string prompt;
-        printf("> ");
-        std::getline(std::cin, prompt);
+    for (int i = embd.size(); i < embd_inp.size() + params.n_predict; i++) {
+        // predict
+        if (embd.size() > 0) {
+            const int64_t t_start_us = ggml_time_us();
 
-        // tokenize the prompt
-        std::vector<gpt_vocab::id> embd_inp = ::gpt_tokenize(vocab, prompt);
-
-        params.n_predict = std::min(params.n_predict, model.hparams.n_ctx - (int) embd_inp.size());
-
-        printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
-        printf("\n");
-
-        std::vector<gpt_vocab::id> embd;
-
-        for (int i = embd.size(); i < embd_inp.size() + params.n_predict; i++) {
-            // predict
-            if (embd.size() > 0) {
-                const int64_t t_start_us = ggml_time_us();
-
-                if (!gptj_eval(model, params.n_threads, n_past, embd, logits, mem_per_token)) {
-                    printf("Failed to predict\n");
-                    return 1;
-                }
-
-                t_predict_us += ggml_time_us() - t_start_us;
+            if (!gptj_eval(model, params.n_threads, n_past, embd, logits, mem_per_token)) {
+                printf("Failed to predict\n");
+                return 1;
             }
 
-            n_past += embd.size();
-            embd.clear();
-
-            if (i >= embd_inp.size()) {
-                // sample next token
-                const int   top_k = params.top_k;
-                const float top_p = params.top_p;
-                const float temp  = params.temp;
-
-                const int n_vocab = model.hparams.n_vocab;
-
-                gpt_vocab::id id = 0;
-
-                {
-                    const int64_t t_start_sample_us = ggml_time_us();
-
-
-
-                    id = gpt_sample_top_k_top_p(vocab, logits.data() + (logits.size() - n_vocab), top_k, top_p, temp, rng);
-
-                    t_sample_us += ggml_time_us() - t_start_sample_us;
-                }
-
-                // add it to the context
-                embd.push_back(id);
-            } else {
-                // if here, it means we are still processing the input prompt
-                for (int k = i; k < embd_inp.size(); k++) {
-                    embd.push_back(embd_inp[k]);
-                    if (embd.size() > params.n_batch) {
-                        break;
-                    }
-                }
-                i += embd.size() - 1;
-            }
-
-            // display text
-            for (auto id : embd) {
-                printf("%s", vocab.id_to_token[id].c_str());
-        }
-            fflush(stdout);
-
-            // end of text token
-            if (embd.back() == 50256) {
-                break;
-            }
+            t_predict_us += ggml_time_us() - t_start_us;
         }
 
-        // report timing
-       {
-            const int64_t t_main_end_us = ggml_time_us();
+        n_past += embd.size();
+        embd.clear();
 
-            printf("\n\n");
-            printf("%s: mem per token = %8zu bytes\n", __func__, mem_per_token);
-            printf("%s:     load time = %8.2f ms\n", __func__, t_load_us/1000.0f);
-            printf("%s:   sample time = %8.2f ms\n", __func__, t_sample_us/1000.0f);
-            printf("%s:  predict time = %8.2f ms / %.2f ms per token\n", __func__, t_predict_us/1000.0f, t_predict_us/1000.0f/n_past);
-            printf("%s:    total time = %8.2f ms\n", __func__, (t_main_end_us - t_main_start_us)/1000.0f);
-       }
+        if (i >= embd_inp.size()) {
+            // sample next token
+            const int   top_k = params.top_k;
+            const float top_p = params.top_p;
+            const float temp  = params.temp;
+
+            const int n_vocab = model.hparams.n_vocab;
+
+            gpt_vocab::id id = 0;
+
+            {
+                const int64_t t_start_sample_us = ggml_time_us();
+
+                id = gpt_sample_top_k_top_p(vocab, logits.data() + (logits.size() - n_vocab), top_k, top_p, temp, rng);
+
+                t_sample_us += ggml_time_us() - t_start_sample_us;
+            }
+
+            // add it to the context
+            embd.push_back(id);
+        } else {
+            // if here, it means we are still processing the input prompt
+            for (int k = i; k < embd_inp.size(); k++) {
+                embd.push_back(embd_inp[k]);
+                if (embd.size() > params.n_batch) {
+                    break;
+                }
+            }
+            i += embd.size() - 1;
+        }
+
+        // display text
+        for (auto id : embd) {
+            printf("%s", vocab.id_to_token[id].c_str());
+        }
+        fflush(stdout);
+
+        // end of text token
+        if (embd.back() == 50256) {
+            break;
+        }
+    }
+
+    // report timing
+    {
+        const int64_t t_main_end_us = ggml_time_us();
+
+        printf("\n\n");
+        printf("%s: mem per token = %8zu bytes\n", __func__, mem_per_token);
+        printf("%s:     load time = %8.2f ms\n", __func__, t_load_us/1000.0f);
+        printf("%s:   sample time = %8.2f ms\n", __func__, t_sample_us/1000.0f);
+        printf("%s:  predict time = %8.2f ms / %.2f ms per token\n", __func__, t_predict_us/1000.0f, t_predict_us/1000.0f/n_past);
+        printf("%s:    total time = %8.2f ms\n", __func__, (t_main_end_us - t_main_start_us)/1000.0f);
+    }
 
     ggml_free(model.ctx);
 
