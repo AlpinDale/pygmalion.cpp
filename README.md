@@ -51,7 +51,7 @@ If Google Play Store says your phone is too new, download from [here](https://f-
 
 2. Run the automatic installer:
 ```bash
-curl https://raw.githubusercontent.com/AlpinDale/pygmalion.cpp/main/install-android.sh | bash
+curl https://raw.githubusercontent.com/AlpinDale/pygmalion.cpp/main/install-termux.sh | bash
 ```
 3. Run pygmalion.cpp by running these inside Termux:
 ```
