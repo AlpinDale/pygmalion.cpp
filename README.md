@@ -16,7 +16,7 @@ Forked from [ggerganov/ggml](https://github.com/ggerganov/ggml).
 
 ## Roadmap
 
-- [X] Example of Pygmalion-6B inference [examples/gpt-j](https://github.com/ggerganov/ggml/tree/master/examples/pyggy)
+- [X] Example of Pygmalion-6B inference [examples/pyggy](https://github.com/AlpinDale/pygmalion.cpp/tree/master/examples/pyggy)
 - [X] Support 4-bit integer quantization
 - [ ] Chat mode
 
@@ -40,5 +40,36 @@ make -j4 pyggy
 ./bin/pyggy -m models/pygmalion-6b-q4_0.bin -p "This is an example"
 ```
 
+## Android guide
+
+You need an android phone with at least 8GB of RAM.
+
+1. Install [Termux](https://play.google.com/store/apps/details?id=com.termux) from the Google Play Store.
+2. Open Termux and run each of the commands below in order:
+```bash
+pkg install clang wget
+
+apt install git build-essential
+
+git clone https://github.com/AlpinDale/pygmalion.cpp && pygmalion.cpp
+
+mkdir build && cd build
+
+cmake ..
+
+make pyggy
+```
+
+This will install `pygmalion.cpp`. To download the model, run:
+```
+chmod +x ../examples/pyggy/download-pyg.sh
+
+../examples/pyggy/download-pyg.sh
+```
+
+And to run `pygmalion.cpp` (**make sure you replace the prompt with whatever you want, keep the quotations):
+```
+./bin/pyggy -m models/pygmalion-6b-q4_0.bin -n 50 -p "Your prompt here."
+```
 
 For more information, checkout the corresponding programs in the [examples](examples) folder.
