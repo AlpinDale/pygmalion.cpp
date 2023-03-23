@@ -10,56 +10,6 @@ It seemed like fun.
 
 ***
 
-Here is a sample run with prompt `int main(int argc, char ** argv) {`:
-
-```
-$ time ./bin/pygmalion-6b-q4_0.bin -p "int main(int argc, char ** argv) {"
-
-gptj_model_load: loading model from 'models/gpt-j-6B/ggml-model.bin' - please wait ...
-gptj_model_load: n_vocab = 50400
-gptj_model_load: n_ctx   = 2048
-gptj_model_load: n_embd  = 4096
-gptj_model_load: n_head  = 16
-gptj_model_load: n_layer = 28
-gptj_model_load: n_rot   = 64
-gptj_model_load: f16     = 1
-gptj_model_load: ggml ctx size = 13334.86 MB
-gptj_model_load: memory_size =  1792.00 MB, n_mem = 57344
-gptj_model_load: ................................... done
-gptj_model_load: model size = 11542.79 MB / num tensors = 285
-main: number of tokens in prompt = 13
-
-int main(int argc, char ** argv) {
-    (void)argc;
-    (void)argv;
-
-    {
-        struct sockaddr_in addr;
-        int addrlen;
-        char * ip = "192.168.1.4";
-        int i;
-
-        if ( (addrlen = sizeof(addr)) == -1 )
-            return -1;
-
-        for (i = 0; i < 10; ++i) {
-            addr.sin_family = AF_INET;
-            addr.sin_addr.s_addr = inet_addr(ip);
-
-main: mem per token = 16430420 bytes
-main:     load time =  6211.48 ms
-main:   sample time =    13.74 ms
-main:  predict time = 26420.34 ms / 124.62 ms per token
-main:    total time = 33035.37 ms
-
-real	0m33.171s
-user	3m32.269s
-sys      0m3.686s
-
-$
-```
-
-
 ## Implementation details
 
 The high level implementation of the model is contained in the [pyggy.cpp](pyggy.cpp) file. The core computations are
