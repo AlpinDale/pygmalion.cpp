@@ -21,9 +21,9 @@ Forked from [ggerganov/ggml](https://github.com/ggerganov/ggml).
 - [ ] Chat mode
 
 
-## GPT inference (example)
+## Pygmalion-6B inference (example)
 
-With ggml you can efficiently run [GPT-2](examples/gpt-2) and [GPT-J](examples/gpt-j) inference on the CPU.
+With ggml you can efficiently run [Pygmalion-6B](examples/pyggy) inference on the CPU.
 
 Here is how to run the example programs:
 
