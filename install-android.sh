@@ -16,7 +16,7 @@ if [ -d "pygmalion.cpp" ]; then
 fi
 
 echo -e "${GREEN}Installing required packages...${NC}"
-apt install clang wget -y
+pkg install clang wget -y
 apt install git build-essential -y
 
 echo -e "${GREEN}Cloning pygmalion.cpp repository...${NC}"
