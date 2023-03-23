@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <regex>
+#include <cassert>
 
 bool gpt_params_parse(int argc, char ** argv, gpt_params & params) {
     for (int i = 1; i < argc; i++) {
