@@ -40,15 +40,5 @@ make -j4 pyggy
 ./bin/pyggy -m models/pygmalion-6b-q4_0.bin -p "This is an example"
 ```
 
-The inference speeds that I get for the different models on my 32GB MacBook M1 Pro are as follows:
-
-| Model | Size  | Time / Token |
-| ---   | ---   | ---    |
-| GPT-2 |  117M |   5 ms |
-| GPT-2 |  345M |  12 ms |
-| GPT-2 |  774M |  23 ms |
-| GPT-2 | 1558M |  42 ms |
-| ---   | ---   | ---    |
-| GPT-J |    6B | 125 ms |
 
 For more information, checkout the corresponding programs in the [examples](examples) folder.
