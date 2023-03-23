@@ -28,7 +28,6 @@ cmake ..
 make pyggy
 
 read -p "$(echo -e "${YELLOW}Do you want to download the model now? (3.6GB) [y/n]${NC}")" -n 1 -r
-
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   echo -e "${GREEN}Downloading model...${NC}"
