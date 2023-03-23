@@ -2,7 +2,7 @@
 
 Local Pygmalion-6B inference on your computer using C/C++
 
-No video card required. You just need to have 16 GB of RAM.
+No video card required. You just need to have 6 GB of RAM.
 
 ## Motivation
 
