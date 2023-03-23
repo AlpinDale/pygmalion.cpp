@@ -71,7 +71,7 @@ pkg install clang wget
 
 apt install git build-essential
 
-git clone https://github.com/AlpinDale/pygmalion.cpp && pygmalion.cpp
+git clone https://github.com/AlpinDale/pygmalion.cpp && cd pygmalion.cpp
 
 mkdir build && cd build
 
