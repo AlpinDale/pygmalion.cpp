@@ -18,7 +18,8 @@ Forked from [ggerganov/ggml](https://github.com/ggerganov/ggml).
 
 - [X] Example of Pygmalion-6B inference [examples/pyggy](https://github.com/AlpinDale/pygmalion.cpp/tree/master/examples/pyggy)
 - [X] Support 4-bit integer quantization
-- [ ] Chat mode
+- [X] Chat mode - **Now implemented!**
+- [ ] Clean up the code
 
 
 ## Pygmalion-6B inference (example)
