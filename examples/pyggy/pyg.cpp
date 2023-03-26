@@ -734,28 +734,28 @@ int main(int argc, char ** argv) {
     //printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
     //printf("\n");
 
-    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n");
-    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n");
-    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n");
+    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n", true);
+    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n", true);
+    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n", false);
     embd_inp.insert(embd_inp.end(), instruct_inp.begin(), instruct_inp.end());
 
     if(!params.prompt.empty()) {
-        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt);
+        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt, true);
         embd_inp.insert(embd_inp.end(), prompt_inp.begin(), prompt_inp.end());
         embd_inp.insert(embd_inp.end(), param_inp.begin(), param_inp.end());
-        embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());  
+        embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());
     }
 
 
     if (params.interactive) {
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
         struct sigaction sigint_action;
-        sigint_action.sa_handler = sigint_handler;
+        sigint_action.sa_handler = siginit_handler;
         sigemptyset (&sigint_action.sa_mask);
         sigint_action.sa_flags = 0;
         sigaction(SIGINT, &sigint_action, NULL);
 #elif defined (_WIN32)
-        signal(SIGINT, sigint_handler);
+        signal(SIGINT, siginit_handler);
 
         // Windows console ANSI colour fix
         DWORD mode = 0;
@@ -790,7 +790,7 @@ int main(int argc, char ** argv) {
     }
 
     // We may want to slide the input window along with the context, but for now we restrict to the context length
-    int remaining_tokens = model.hparams.n_ctx - embed_inp.size();
+    int remaining_tokens = model.hparams.n_ctx - embd_inp.size();
     int input_consumed = 0;
     bool input_noecho = true;
 
@@ -800,7 +800,7 @@ int main(int argc, char ** argv) {
         is_interacting = true;
     }
 
-    if (params.user_color) {
+    if (params.use_color) {
         printf(ANSI_COLOR_YELLOW);
     }
 
