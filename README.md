@@ -2,12 +2,14 @@
 
 Forked from [ggerganov/ggml](https://github.com/ggerganov/ggml).
 
+`pygmalion.cpp` is an implementation of the popular language model, [Pygmalion 6B](https://huggingface.co/PygmalionAI/pygmalion.cpp), in C/C++. This allows the large language model to run directly on the CPU. The weights provided here are quantized down to 4-bit integers (from the original 16-bit floating points) - the 6.4x size reduction and the efficient quantization enables the model to run on devices with 8GB of RAM (not VRAM!). This is still a work-in-progress, so please report any issues [here](https://github.com/AlpinDale/pygmalion.cpp/issues). 
+
 ## Features
 
 - Written in C
 - 16-bit float support
 - 4-bit integer support
-- Automatic differentiation (WIP in progress)
+- Automatic differentiation (work in progress)
 - ADAM and L-BFGS optimizers
 - Optimized for Apple silicon via NEON intrinsics and Accelerate framework
 - On x86 architectures utilzes AVX intrinsics
