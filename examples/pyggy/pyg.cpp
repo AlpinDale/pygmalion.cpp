@@ -734,17 +734,18 @@ int main(int argc, char ** argv) {
     //printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
     //printf("\n");
 
-    // std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n", true);
-    // std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n", true);
-    // std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n", false);
-    // embd_inp.insert(embd_inp.end(), instruct_inp.begin(), instruct_inp.end());
+    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n");
+    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n");
+    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n");
+    embd_inp.insert(embd_inp.end(), instruct_inp.begin(), instruct_inp.end());
 
     if(!params.prompt.empty()) {
-        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt, true);
+        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt);
         embd_inp.insert(embd_inp.end(), prompt_inp.begin(), prompt_inp.end());
         embd_inp.insert(embd_inp.end(), param_inp.begin(), param_inp.end());
         embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());  
     }
+
 
     if (params.interactive) {
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
