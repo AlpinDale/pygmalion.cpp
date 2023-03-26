@@ -12,20 +12,30 @@
 // CLI argument parsing
 //
 
+// The default parameters
 struct gpt_params {
     int32_t seed      = -1; // RNG seed
     int32_t n_threads = std::min(4, (int32_t) std::thread::hardware_concurrency());
-    int32_t n_predict = 200; // new tokens to predict
-
+    int32_t n_predict = 128; // new tokens to predict
+    int32_t repeat_last_n = 64;  // last n tokens to penalize
+    int32_t n_ctx = 2048; //context size
+    
     // sampling parameters
-    int32_t top_k = 0;
-    float   top_p = 1.0f;
-    float   temp  = 1.0f;
+    int32_t top_k = 40;
+    float   top_p = 0.95f;
+    float   temp  = 0.10f;
+    float   repeat_penalty  = 1.30f;
 
     int32_t n_batch = 8; // batch size for prompt processing
 
-    std::string model = "models/pygmalion-6b-ggml-4bit/pygmalion-6b-q4_0.bin"; // model path
+    std::string model = "ggml-alpaca-7b-q4.bin"; // model path
     std::string prompt;
+
+    bool use_color = true; // use color to distinguish generations and inputs
+
+    bool interactive = true; // interactive mode
+    bool interactive_start = true; // reverse prompt immediately
+    std::string antiprompt = ""; // string upon seeing which more user input is prompted
 };
 
 bool gpt_params_parse(int argc, char ** argv, gpt_params & params);
@@ -63,6 +73,10 @@ std::map<std::string, int32_t> json_parse(const std::string & fname);
 //
 std::vector<gpt_vocab::id> gpt_tokenize(const gpt_vocab & vocab, const std::string & text);
 
+// TODO: this is probably wrong, but I cannot figure out how this tokenizer works ..
+// ref: https://github.com/google/sentencepiece
+std::vector<gpt_vocab::id> llama_tokenize(const gpt_vocab & vocab, const std::string & text, bool bos);
+
 // load the tokens from encoder.json
 bool gpt_vocab_init(const std::string & fname, gpt_vocab & vocab);
 
@@ -71,16 +85,18 @@ bool gpt_vocab_init(const std::string & fname, gpt_vocab & vocab);
 //   - consider only the top K tokens
 //   - from them, consider only the top tokens with cumulative probability > P
 //
-// TODO: not sure if this implementation is correct
-// TODO: temperature is not implemented
-//
-gpt_vocab::id gpt_sample_top_k_top_p(
+gpt_vocab::id llama_sample_top_p_top_k(
         const gpt_vocab & vocab,
         const float * logits,
-        int    top_k,
+        std::vector<gpt_vocab::id> & last_n_tokens,
+        double repeat_penalty,
+        int top_k,
         double top_p,
         double temp,
         std::mt19937 & rng);
+
+// filer to top K tokens from list of logits
+void sample_top_k(std::vector<std::pair<double, gpt_vocab::id>> & logits_id, int top_k);
 
 //
 // Quantization
