@@ -43,24 +43,7 @@ make -j4 pyggy
 
 ## Android guide
 
-
 You need an android phone with at least 8GB of RAM.
-
-1. Install [Termux](https://play.google.com/store/apps/details?id=com.termux) from the Google Play Store.
-
-If Google Play Store says your phone is too new, download from [here](https://f-droid.org/repo/com.termux_118.apk).
-
-2. Run the automatic installer:
-```bash
-curl https://raw.githubusercontent.com/AlpinDale/pygmalion.cpp/main/install-droid.sh | bash
-```
-3. Run pygmalion.cpp by running these inside Termux:
-```
-chmod +x start.sh
-./start.sh`
-```
-
-#### Manual setup on Android:
 
 1. 1. Install [Termux](https://play.google.com/store/apps/details?id=com.termux) from the Google Play Store.
 
@@ -83,14 +66,14 @@ make pyggy
 
 This will install `pygmalion.cpp`. To download the model, run:
 ```
-chmod +x ../examples/pyggy/download-pyg.sh
+chmod +x ../examples/pyggy/download.sh
 
-../examples/pyggy/download-pyg.sh
+../examples/pyggy/download.sh
 ```
 
 And to run `pygmalion.cpp` (**make sure you replace the prompt with whatever you want, keep the quotations**):
 ```
-./bin/pyggy -m models/pygmalion-6b-q4_0.bin -n 50 -p "Your prompt here."
+./bin/pyggy -m models/pygmalion-6b-v3-q4_0.bin
 ```
 
 For more information, checkout the corresponding programs in the [examples](examples) folder.
