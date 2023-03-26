@@ -1,41 +1,64 @@
 #!/bin/bash
 
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # no color
+# This script downloads Pygmalion 6B model files that have already been converted to ggml format.
+# This way you don't have to convert them yourself.
 
-URL="https://huggingface.co/alpindale/pygmalion-6b-ggml-4bit/resolve/main/pygmalion-6b-q4_0.bin"
-FILENAME="pygmalion-6b-q4_0.bin"
 
-if [ ! -d "models" ]; then
-  mkdir models
+src="https://huggingface.co/alpindale/pygmalion-6b-ggml"
+pfx="resolve/main/pygmalion-6b"
+
+ggml_path=$(dirname $(realpath $0))
+
+models=( "Main:v3" "V8P1:v8p1" "V8P2:v8p2" "V8P3:v8p3" "V8P4:v8p4" )
+declare -A model_map=()
+for i in "${models[@]}"; do
+    key=${i%%:*}
+    val=${i##*:}
+    model_map["$key"]="$val"
+done
+
+function list_models {
+    printf "\n"
+    printf "  Available models:\n"
+    for i in "${!model_map[@]}"; do
+        printf "  %d. %s\n" $((++j)) "$i"
+    done
+    printf "\n"
+}
+
+list_models
+
+read -p "Enter the number of the model you want to download: " choice
+
+if [[ ! "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#model_map[@]} )); then
+    printf "Invalid choice. Please enter a valid number.\n"
+    exit 1
 fi
 
-if [ -f "models/$FILENAME" ]; then
-  if [ $(md5sum models/$FILENAME | cut -d' ' -f1) = "dd46de7882a7dcbbf46e36f64794680b" ]; then
-    echo -e "${YELLOW}File already exists and MD5 hash matches!${NC}"
-    exit 0
-  else
-    read -p "$(echo -e "${YELLOW}File already exists. Do you want to resume the download? [y/n]${NC}")" -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-      echo -e "${GREEN}Resuming download...${NC}"
-      wget -c -q --show-progress $URL -P models/ -O $FILENAME
-    else
-      echo -e "${YELLOW}Deleting file and re-downloading.${NC}"
-      rm -f models/$FILENAME
-    fi
-  fi
-fi
+model=${models[$choice - 1]%%:*}
 
-if [ ! -f "models/$FILENAME" ]; then
-  echo -e "${GREEN}Downloading file...${NC}"
-  wget -c -q --show-progress $URL -P models/ -O $FILENAME
-fi
+technical_name=${model_map["$model"]}
 
-if [ $(md5sum models/$FILENAME | cut -d' ' -f1) = "dd46de7882a7dcbbf46e36f64794680b" ]; then
-  echo -e "${GREEN}Download complete and MD5 hash matches!${NC}"
+printf "Downloading pyg model $model ...\n"
+
+mkdir -p models/
+
+if [ -x "$(command -v wget)" ]; then
+    wget --quiet --show-progress -O models/pygmalion-6b-$technical_name-q4_0.bin $src/$pfx-$technical_name-q4_0.bin
+elif [ -x "$(command -v curl)" ]; then
+    curl -L --output models/pygmalion-6b-$technical_name-q4_0.bin $src/$pfx-$technical_name-q4_0.bin
 else
-  echo -e "${YELLOW}Download complete but MD5 hash doesn't match. Please try again.${NC}"
-  rm -f models/$FILENAME
+    printf "Either wget or curl is required to download models.\n"
+    exit 1
 fi
+
+if [ $? -ne 0 ]; then
+    printf "Failed to download the pyg model $model \n"
+    printf "Please try again or open an issue in the github page.\n"
+    exit 1
+fi
+
+printf "Done! Model '$model' saved in 'models/pygmalion-6b-$model-q4_0.bin'\n"
+printf "You can now use it like this:\n\n"
+printf "  $ ./bin/pyggy -m models/pygmalion-6b-$model-q4_0.bin\n"
+printf "\n"
