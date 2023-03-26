@@ -28,7 +28,7 @@ function list_models {
 
 list_models
 
-read -p "Enter the number of the model you want to download: " choice
+read -s -p "Enter the number of the model you want to download: " choice
 
 if [[ ! "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#model_map[@]} )); then
     printf "Invalid choice. Please enter a valid number.\n"
