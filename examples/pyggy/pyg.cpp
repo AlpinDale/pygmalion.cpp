@@ -644,7 +644,7 @@ static bool is_interacting = false;
 #if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__)) || defined (_WIN32)
 void siginit_handler(int signo) {
     printf(ANSI_COLOR_RESET);
-    if (signo == SIGNIT) {
+    if (signo == SIGINT) {
         if (!is_interacting) {
             is_interacting=true;
         } else {
@@ -715,7 +715,7 @@ int main(int argc, char ** argv) {
     {
         fprintf(stderr, "\n");
         fprintf(stderr, "system_info: n_threads = %d / %d | %s\n",
-                params.n_threads, std::thread::hardware_concurrency(), gptj_print_system_info())
+                params.n_threads, std::thread::hardware_concurrency(), gptj_print_system_info());
     }
 
     int n_past = 0;
@@ -734,13 +734,13 @@ int main(int argc, char ** argv) {
     //printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
     //printf("\n");
 
-    std::vector<gpt_vocab::id>> instruct_inp = ::gptj_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n", true);
-    std::vector<gpt_vocab::id> prompt_inp = ::gptj_tokenize(vocab, "### Instruction:\n\n", true);
-    std::vector<gpt_vocab::id> response_inp = ::gptj_tokenize(vocab, "### Response:\n\n", false);
+    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n", true);
+    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n", true);
+    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n", false);
     embd_inp.insert(embd_inp.end(), instruct_inp.begin(), instruct_inp.end());
 
     if(!params.prompt.empty()) {
-        std::vector<gptj_vocab::id> param_inp = ::gptj_tokenize(vocab, params.prompt, true);
+        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt, true);
         embd_inp.insert(embd_inp.end(), prompt_inp.begin(), prompt_inp.end());
         embd_inp.insert(embd_inp.end(), param_inp.begin(), param_inp.end());
         embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());  
@@ -908,7 +908,7 @@ int main(int argc, char ** argv) {
                         buf[n_read+1] = 0;
                     }
 
-                    std::vector<gpt_vocab::id> line_inp = ::gptj_tokenize(vocab, buf, false);
+                    std::vector<gpt_vocab::id> line_inp = ::gpt_tokenize(vocab, buf, false);
                     embd_inp.insert(embd_inp.end(), line_inp.begin(), line_inp.end());
                     embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());
 
