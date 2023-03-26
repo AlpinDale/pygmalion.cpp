@@ -734,13 +734,13 @@ int main(int argc, char ** argv) {
     //printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
     //printf("\n");
 
-    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n", true);
-    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n", true);
-    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n", false);
+    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n");
+    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n");
+    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n");
     embd_inp.insert(embd_inp.end(), instruct_inp.begin(), instruct_inp.end());
 
     if(!params.prompt.empty()) {
-        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt, true);
+        std::vector<gpt_vocab::id> param_inp = ::gpt_tokenize(vocab, params.prompt);
         embd_inp.insert(embd_inp.end(), prompt_inp.begin(), prompt_inp.end());
         embd_inp.insert(embd_inp.end(), param_inp.begin(), param_inp.end());
         embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());
@@ -806,7 +806,7 @@ int main(int argc, char ** argv) {
 
     while (remaining_tokens > 0) {
         // predict
-        if (embed.size() > 0) {
+        if (embd.size() > 0) {
             const int64_t t_start_us = ggml_time_us();
 
             if (!gptj_eval(model, params.n_threads, n_past, embd, logits, mem_per_token)) {
@@ -909,7 +909,7 @@ int main(int argc, char ** argv) {
                         buf[n_read+1] = 0;
                     }
 
-                    std::vector<gpt_vocab::id> line_inp = ::gpt_tokenize(vocab, buf, false);
+                    std::vector<gpt_vocab::id> line_inp = ::gpt_tokenize(vocab, buf);
                     embd_inp.insert(embd_inp.end(), line_inp.begin(), line_inp.end());
                     embd_inp.insert(embd_inp.end(), response_inp.begin(), response_inp.end());
 
