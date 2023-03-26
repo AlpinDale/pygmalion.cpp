@@ -45,7 +45,7 @@ make -j4 pyggy
 
 You need an android phone with at least 8GB of RAM.
 
-1. 1. Install [Termux](https://play.google.com/store/apps/details?id=com.termux) from the Google Play Store.
+1. Install [Termux](https://play.google.com/store/apps/details?id=com.termux) from the Google Play Store.
 
 If Google Play Store says your phone is too new, download from [here](https://f-droid.org/repo/com.termux_118.apk).
 
