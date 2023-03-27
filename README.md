@@ -40,7 +40,7 @@ make -j4 pyggy
 
 # Run the Pygmalion 6B model (quantized to 4-bits, requires around 6GB of RAM for full ctx). Using the main branch model as an example:
 ../examples/pyggy/download.sh
-./bin/pyggy -m models/pygmalion-6b-v3q4_0.bin
+./bin/pyggy -m models/pygmalion-6b-v3-q4_0.bin
 ```
 
 ## Android guide
