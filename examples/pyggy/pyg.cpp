@@ -734,9 +734,9 @@ int main(int argc, char ** argv) {
     //printf("%s: number of tokens in prompt = %zu\n", __func__, embd_inp.size());
     //printf("\n");
 
-    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, " Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n");
-    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "### Instruction:\n\n");
-    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "### Response:\n\n");
+    std::vector<gpt_vocab::id> instruct_inp = ::gpt_tokenize(vocab, "");
+    std::vector<gpt_vocab::id> prompt_inp = ::gpt_tokenize(vocab, "");
+    std::vector<gpt_vocab::id> response_inp = ::gpt_tokenize(vocab, "");
     embd_inp.insert(embd_inp.end(), instruct_inp.begin(), instruct_inp.end());
 
     if(!params.prompt.empty()) {
