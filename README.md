@@ -16,11 +16,17 @@ Forked from [ggerganov/ggml](https://github.com/ggerganov/ggml).
 - No third-party dependencies
 - Zero memory allocations during runtime
 
+## Current issues
+
+- Unlimited text generation
+- Tags (such as `<START>`, `Scenario`) are generated
+
 ## Roadmap
 
 - [X] Example of Pygmalion-6B inference [examples/pyggy](https://github.com/AlpinDale/pygmalion.cpp/tree/master/examples/pyggy)
 - [X] Support 4-bit integer quantization
 - [X] Chat mode - **Now implemented!**
+- [ ] Fix the current issues
 - [ ] Clean up the code
 
 
