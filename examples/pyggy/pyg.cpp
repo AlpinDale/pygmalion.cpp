@@ -759,7 +759,7 @@ int main(int argc, char ** argv) {
 
         // Windows console ANSI colour fix
         DWORD mode = 0;
-        HANDLE hConsole - GetStdHandle(STD_OUTPUT_HANDLE);
+        HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         if (hConsole && hConsole != INVALID_HANDLE_VALUE && GetConsoleMode(hConsole, &mode)){
             SetConsoleMode(hConsole, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
             SetConsoleOutputCP(CP_UTF8);
