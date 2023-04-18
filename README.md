@@ -2,6 +2,15 @@
 
 Forked from [ggerganov/ggml](https://github.com/ggerganov/ggml).
 
+## Repository Status: Inactive
+
+This repository is currently inactive and is not being actively maintained or updated. Feel free to use the code as-is, but please note that no further development or bug fixes are planned at this time.
+
+If you have any questions or issues with the code, please feel free to open an issue and I'll do my best to assist you. However, please understand that my response times may be slower than usual.
+
+The project has moved in part to [LostRuins/koboldcpp](https://github.com/LostRuins/koboldcpp) where new features are added constantly.
+
+***
 `pygmalion.cpp` is an implementation of the popular language model, [Pygmalion 6B](https://huggingface.co/PygmalionAI/pygmalion.cpp), in C/C++. This allows the large language model to run directly on the CPU. The weights provided here are quantized down to 4-bit integers (from the original 16-bit floating points) - the 6.4x size reduction and the efficient quantization enables the model to run on devices with 8GB of RAM (not VRAM!). This is still a work-in-progress, so please report any issues [here](https://github.com/AlpinDale/pygmalion.cpp/issues). 
 
 ## Features
